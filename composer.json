@@ -1,0 +1,11 @@
+{
+    "require": {
+        "bramus/router": "^1.6"
+    },
+    "scripts": {
+        "serv": [
+            "Composer\\Config::disableProcessTimeout",
+            "php -S localhost:80"
+        ]
+    }
+}

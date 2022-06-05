@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamesAPI</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+        integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <style>
+        html,
+        body {
+            height: 100%;
+            min-height: 100%;
+            max-height: 100%;
+        }
+
+        body,
+        div,
+        form,
+        input,
+        select {
+            padding: 0;
+            margin: 0;
+            outline: none;
+            font-family: Roboto, Arial, sans-serif;
+            font-size: 14px;
+            color: #666;
+            line-height: 22px;
+        }
+
+        h1 {
+            font-size: 60px;
+            font-weight: 400;
+            margin: 0 0 30px;
+            text-align: center;
+        }
+
+        h2,
+        h3 {
+            margin: 15px 0 4px;
+            font-weight: 400;
+        }
+
+        h3 {
+            margin: 20px 0 4px;
+            font-weight: 400;
+        }
+
+        .small {
+            font-size: 10px;
+            line-height: 18px;
+        }
+
+        .testbox {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: inherit;
+            padding: 3px;
+        }
+
+        form {
+            width: 50%;
+            padding: 80px 30px 80px 30px;
+            margin-left: 80px;
+            margin-right: 80px;
+            background: #fff;
+            box-shadow: 0 2px 5px #ccc;
+        }
+
+        input {
+            width: calc(100% - 10px);
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            vertical-align: middle;
+        }
+
+        input:hover,
+        textarea:hover,
+        select:hover {
+            outline: none;
+            border: 1px solid #095484;
+            background: #e6eef7;
+        }
+
+        .title-block select,
+        .title-block input {
+            margin-bottom: 10px;
+        }
+
+        select {
+            padding: 7px 0;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+            background: transparent;
+        }
+
+        select {
+            width: 100%;
+        }
+
+        option {
+            background: #fff;
+        }
+
+        #url:hover {
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        function copyText(field) {
+            field.select();
+            navigator.clipboard.writeText(field.value)
+        }
+
+        function updateUrl() {
+            let game = document.getElementById('game');
+            let lang = document.getElementById('lang');
+            let obj = document.getElementById('obj');
+            let url = document.getElementById('url');
+
+            let game_value = game.selectedOptions[0].value;
+            let lang_value = lang.selectedOptions[0].value != '' ? lang.selectedOptions[0].value : false;
+            let obj_value = obj.selectedOptions[0].value;
+
+            url.value = window.location.href + game_value + '/' + (lang_value ? lang_value + '/' : '') + obj_value;
+        }
+
+        function openUrlOnNewTab() {
+            let url = document.getElementById('url');
+            window.open(url.value, '_blank');
+        }
+    </script>
+</head>
+
+<body>
+    <div class="testbox">
+        <form action="/">
+            <h1>
+                <span>GamesAPI</span>
+                <h2>URL</h2>
+                <div style="display: flex;">
+                    <input class="url" type="text" name="url" id="url" onclick="copyText(this)" readonly />
+                    <button type="button" onclick="openUrlOnNewTab()">Abrir</button>
+                </div>
+            </h1>
+            <h3>Juego</h3>
+            <select id="game" onchange="updateUrl()">
+                <option value="monster_hunter_world">Monster Hunter World</option>
+            </select>
+            <h3>Idioma</h3>
+            <select id="lang" onchange="updateUrl()">
+                <option value=""></option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+                <option value="fr">Français</option>
+                <option value="it">Italiano</option>
+                <option value="de">Deutsch</option>
+                <option value="es">Español</option>
+                <option value="pt">Português do Brasil</option>
+                <option value="pl">Polski</option>
+                <option value="ru">Pусский</option>
+                <option value="ko">한국어</option>
+                <option value="zh">繁體中文</option>
+                <option value="ar">Arabe</option>
+            </select>
+            <h3>Objeto</h3>
+            <select id="obj" onchange="updateUrl()">
+                <option value="monsters">Monsters</option>
+                <option value="armors">Armors</option>
+                <option value="weapons">Weapons</option>
+                <option value="quests">Quests</option>
+                <option value="skills">Skills</option>
+                <option value="tools">Tools</option>
+                <option value="decorations">Decorations</option>
+                <option value="charms">Charms</option>
+                <option value="crafts">Crafts</option>
+            </select>
+        </form>
+    </div>
+
+    <script type="text/javascript">
+        updateUrl();
+    </script>
+</body>
+
+</html>
