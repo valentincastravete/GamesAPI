@@ -75,6 +75,18 @@ $router->get('/', function () {
     readfile("home.html");
 });
 
+function executeSQL(SQLite3 $db, string $sql): array
+{
+    $result = $db->query($sql);
+    $array = [];
+    if ($result && $result->numColumns() > 0) {
+        while ($elem = $result->fetchArray(SQLITE3_ASSOC)) {
+            $array[] = $elem;
+        };
+    }
+    return $array;
+}
+
 $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
 
     // MONSTERS
@@ -274,6 +286,54 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         returnJsonData($weapon);
     });
 
+    // QUESTS
+    $router->get('/([a-z]{2}/)?quests', function ($language = null) use ($db, $lang) {
+        header('Content-Type: application/json');
+
+        $lang = $language != null ? $language : $lang;
+
+        // Get quests
+        $quests = executeSQL($db, "SELECT q.id as id, q.order_id as order_id, q.category as category, q.rank as rank, q.stars as stars, q.stars_raw as stars_raw, q.quest_type as quest_type, l.name as location, q.zenny as zenny  FROM quest as q JOIN location_text as l ON q.location_id = l.id WHERE l.lang_id = '" . $lang . "' ORDER BY q.order_id");
+
+        returnJsonData($quests);
+    });
+
+    // QUEST
+    $router->get('/([a-z]{2}/)?quest/(\d+)', function ($language = null, $id) use ($db, $lang) {
+        header('Content-Type: application/json');
+
+        $lang = $language != null ? $language : $lang;
+
+        // Get quest
+        $quest = executeSQL($db, "SELECT q.id as id, q.order_id as order_id, q.category as category, q.rank as rank, q.stars as stars, q.stars_raw as stars_raw, q.quest_type as quest_type, l.name as location, q.zenny as zenny  FROM quest as q JOIN location_text as l ON q.location_id = l.id WHERE q.id = '" . $id . "' AND l.lang_id = '" . $lang . "' ORDER BY q.order_id");
+
+        returnJsonData($quest);
+    });
+
+    // SKILLS
+    $router->get('/([a-z]{2}/)?skills', function ($language = null) use ($db, $lang) {
+        header('Content-Type: application/json');
+
+        $lang = $language != null ? $language : $lang;
+
+        // Get skills
+        $skills = executeSQL($db, "SELECT skilltree_id as id, level, description FROM skill WHERE lang_id = '" . $lang . "'");
+
+        returnJsonData($skills);
+    });
+
+    // SKILL
+    $router->get('/([a-z]{2}/)?skill/(\d+)', function ($language = null, $id) use ($db, $lang) {
+        header('Content-Type: application/json');
+
+        $lang = $language != null ? $language : $lang;
+
+        // Get skill
+        $skill = executeSQL($db, "SELECT skilltree_id as id, level, description FROM skill WHERE id = '" . $id . "' AND lang_id = '" . $lang . "'");
+
+        returnJsonData($skill);
+    });
+
     // TOOLS
     $router->get('/([a-z]{2}/)?tools', function ($language = null) use ($db, $lang) {
         header('Content-Type: application/json');
@@ -298,30 +358,6 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         returnJsonData($tool);
     });
 
-    // QUESTS
-    $router->get('/([a-z]{2}/)?quests', function ($language = null) use ($db, $lang) {
-        header('Content-Type: application/json');
-
-        $lang = $language != null ? $language : $lang;
-
-        // Get quests
-        $quests = executeSQL($db, 'SELECT * FROM quest ORDER BY order_id');
-
-        returnJsonData($quests);
-    });
-
-    // QUEST
-    $router->get('/([a-z]{2}/)?quest/(\d+)', function ($language = null, $id) use ($db, $lang) {
-        header('Content-Type: application/json');
-
-        $lang = $language != null ? $language : $lang;
-
-        // Get quest
-        $quest = executeSQL($db, "SELECT * FROM quest WHERE id = '" . $id . "'");
-
-        returnJsonData($quest);
-    });
-
     // DECORATIONS
     $router->get('/([a-z]{2}/)?decorations', function ($language = null) use ($db, $lang) {
         header('Content-Type: application/json');
@@ -329,7 +365,7 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         $lang = $language != null ? $language : $lang;
 
         // Get decorations
-        $decorations = executeSQL($db, 'SELECT * FROM decoration ORDER BY order_id');
+        $decorations = executeSQL($db, 'SELECT * FROM decoration');
 
         returnJsonData($decorations);
     });
@@ -370,30 +406,6 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         returnJsonData($charm);
     });
 
-    // SKILLS
-    $router->get('/([a-z]{2}/)?skills', function ($language = null) use ($db, $lang) {
-        header('Content-Type: application/json');
-
-        $lang = $language != null ? $language : $lang;
-
-        // Get skills
-        $skills = executeSQL($db, 'SELECT * FROM skill ORDER BY order_id');
-
-        returnJsonData($skills);
-    });
-
-    // SKILL
-    $router->get('/([a-z]{2}/)?skill/(\d+)', function ($language = null, $id) use ($db, $lang) {
-        header('Content-Type: application/json');
-
-        $lang = $language != null ? $language : $lang;
-
-        // Get skill
-        $skill = executeSQL($db, "SELECT * FROM skill WHERE skilltree_id = '" . $id . "'");
-
-        returnJsonData($skill);
-    });
-
     // CRAFTS
     $router->get('/([a-z]{2}/)?crafts', function ($language = null) use ($db, $lang) {
         header('Content-Type: application/json');
@@ -401,7 +413,7 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         $lang = $language != null ? $language : $lang;
 
         // Get crafts
-        $crafts = executeSQL($db, 'SELECT * FROM recipe_item ORDER BY order_id');
+        $crafts = executeSQL($db, 'SELECT * FROM recipe_item');
 
         returnJsonData($crafts);
     });
@@ -418,17 +430,6 @@ $router->mount('/monster_hunter_world', function () use ($db, $router, $lang) {
         returnJsonData($craft);
     });
 });
-function executeSQL(SQLite3 $db, string $sql): array
-{
-    $result = $db->query($sql);
-    $array = [];
-    if ($result && $result->numColumns() > 0) {
-        while ($elem = $result->fetchArray(SQLITE3_ASSOC)) {
-            $array[] = $elem;
-        };
-    }
-    return $array;
-}
 
 function getExtraMonsterInfo(SQLite3 $db, string $lang): array
 {
